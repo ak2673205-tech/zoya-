@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Outer Glow Ring -->
+    <path
+        android:pathData="M 54 28 A 26 26 0 1 0 54 80 A 26 26 0 1 0 54 28 Z"
+        android:strokeWidth="2.5"
+        android:strokeColor="#38BDF8" />
+    
+    <!-- Diagonal Orbit Ring -->
+    <path
+        android:pathData="M 32 38 C 42 30, 66 32, 76 44 C 86 56, 76 76, 54 78 C 32 80, 22 66, 32 38 Z"
+        android:strokeWidth="2"
+        android:strokeColor="#A855F7" />
+
+    <!-- Center AI Glowing Core -->
+    <path
+        android:pathData="M 54 36 A 18 18 0 1 0 54 72 A 18 18 0 1 0 54 36 Z">
+        <aapt:attr name="android:fillColor">
+            <gradient
+                android:centerX="50"
+                android:centerY="48"
+                android:gradientRadius="20"
+                android:startColor="#67E8F9"
+                android:endColor="#6366F1"
+                android:type="radial" />
+        </aapt:attr>
+    </path>
+
+    <!-- Inner Core Spark -->
+    <path
+        android:pathData="M 54 48 A 6 6 0 1 0 54 60 A 6 6 0 1 0 54 48 Z"
+        android:fillColor="#FFFFFF" />
+
+    <!-- Top Wave Dot -->
+    <path
+        android:pathData="M 54 23 A 2.5 2.5 0 1 0 54 28 A 2.5 2.5 0 1 0 54 23 Z"
+        android:fillColor="#38BDF8" />
+    <!-- Bottom Wave Dot -->
+    <path
+        android:pathData="M 54 80 A 2.5 2.5 0 1 0 54 85 A 2.5 2.5 0 1 0 54 80 Z"
+        android:fillColor="#A855F7" />
+</vector>
