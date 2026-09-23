@@ -80,7 +80,7 @@ class AnuViewModel(application: Application) : AndroidViewModel(application) {
     private val _partialSpokenText = MutableStateFlow("")
     val partialSpokenText: StateFlow<String> = _partialSpokenText.asStateFlow()
 
-    private val _lastStatusMessage = MutableStateFlow("Tap the orb or microphone to talk")
+    private val _lastStatusMessage = MutableStateFlow("Boliye, main sun rahi hoon...")
     val lastStatusMessage: StateFlow<String> = _lastStatusMessage.asStateFlow()
 
     // Dialog & UI states
@@ -107,7 +107,7 @@ class AnuViewModel(application: Application) : AndroidViewModel(application) {
                 voiceStateManager.setState(VoiceState.IDLE)
             },
             onErrorSpeaking = { error ->
-                Log.e(TAG, "TTS Error: $error")
+                Log.w(TAG, "TTS notice: $error")
                 voiceStateManager.setState(VoiceState.IDLE)
             }
         )
@@ -128,13 +128,13 @@ class AnuViewModel(application: Application) : AndroidViewModel(application) {
                 _partialSpokenText.value = ""
                 voiceStateManager.setState(VoiceState.IDLE)
                 if (errorMsg == "Listening stopped" || errorMsg == "Ready") {
-                    _lastStatusMessage.value = "Tap the orb or microphone to talk"
+                    _lastStatusMessage.value = "Boliye, main sun rahi hoon..."
                 } else {
                     _lastStatusMessage.value = errorMsg
                     viewModelScope.launch {
                         kotlinx.coroutines.delay(4000L)
                         if (_lastStatusMessage.value == errorMsg) {
-                            _lastStatusMessage.value = "Tap the orb or microphone to talk"
+                            _lastStatusMessage.value = "Boliye, main sun rahi hoon..."
                         }
                     }
                 }
@@ -175,7 +175,7 @@ class AnuViewModel(application: Application) : AndroidViewModel(application) {
     private fun startListening() {
         ttsManager?.stop()
         voiceStateManager.setState(VoiceState.LISTENING)
-        _lastStatusMessage.value = "Listening to you..."
+        _lastStatusMessage.value = "Haanji boliye, sun rahi hoon..."
         speechRecognizerHelper?.startListening("hi-IN")
     }
 
@@ -186,7 +186,7 @@ class AnuViewModel(application: Application) : AndroidViewModel(application) {
         // Interruption check
         ttsManager?.stop()
 
-        _lastStatusMessage.value = "Processing command..."
+        _lastStatusMessage.value = "Soch rahi hoon aapke liye..."
         viewModelScope.launch {
             commandProcessor.processUserCommand(trimmed) { response, isSuccess ->
                 _lastStatusMessage.value = response

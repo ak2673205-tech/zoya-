@@ -46,14 +46,47 @@ class TextToSpeechManager(
     private fun setupLanguage() {
         tts?.let { engine ->
             val hindiLocale = Locale.forLanguageTag("hi-IN")
-            val hindiResult = engine.isLanguageAvailable(hindiLocale)
-            if (hindiResult >= TextToSpeech.LANG_AVAILABLE) {
+            val englishIndianLocale = Locale.forLanguageTag("en-IN")
+
+            if (engine.isLanguageAvailable(hindiLocale) >= TextToSpeech.LANG_AVAILABLE) {
                 engine.language = hindiLocale
+            } else if (engine.isLanguageAvailable(englishIndianLocale) >= TextToSpeech.LANG_AVAILABLE) {
+                engine.language = englishIndianLocale
             } else {
                 engine.language = Locale.ENGLISH
             }
-            engine.setPitch(1.05f) // Friendly natural pitch
-            engine.setSpeechRate(1.0f) // Natural speaking rate
+
+            // Select highest quality natural female voice for warm companion / GF mode tone
+            try {
+                val voices = engine.voices
+                if (!voices.isNullOrEmpty()) {
+                    val naturalVoice = voices.find { voice ->
+                        val name = voice.name.lowercase(Locale.ROOT)
+                        val isLangMatch = voice.locale.language == "hi" || (voice.locale.language == "en" && voice.locale.country == "IN")
+                        val isFemale = name.contains("female") || name.contains("f00") || name.contains("-f-") ||
+                                name.contains("hie") || name.contains("end") ||
+                                voice.features.any { it.contains("female", ignoreCase = true) }
+                        isLangMatch && isFemale && !voice.isNetworkConnectionRequired
+                    } ?: voices.find { voice ->
+                        val name = voice.name.lowercase(Locale.ROOT)
+                        (name.contains("female") || voice.features.any { it.contains("female", ignoreCase = true) }) &&
+                                !voice.isNetworkConnectionRequired
+                    } ?: voices.find { voice ->
+                        voice.locale.language == "hi" || (voice.locale.language == "en" && voice.locale.country == "IN")
+                    }
+
+                    naturalVoice?.let {
+                        engine.voice = it
+                        Log.d(TAG, "Selected natural companion voice: ${it.name}")
+                    }
+                }
+            } catch (e: Exception) {
+                Log.d(TAG, "Voice selection notice: ${e.message}")
+            }
+
+            // Sweet, feminine, warm companion tone (not robotic)
+            engine.setPitch(1.14f)
+            engine.setSpeechRate(0.98f)
         }
     }
 
@@ -103,17 +136,19 @@ class TextToSpeechManager(
             putString(TextToSpeech.Engine.KEY_PARAM_UTTERANCE_ID, utteranceId)
         }
 
-        // Clean out any markdown bolding / asterisks from AI text before speaking
+        // Clean out any formatting, emojis, and symbols so speech sounds sweet and natural
         val cleanText = text
-            .replace("**", "")
-            .replace("*", "")
-            .replace("#", "")
-            .replace("`", "")
+            .replace(Regex("[*#`_~>]"), "") // markdown
+            .replace(Regex("[\uD800-\uDBFF][\uDC00-\uDFFF]"), "") // emojis
+            .replace(Regex("[\\p{So}\\p{Cn}]"), "") // misc symbols
+            .replace(Regex("\\s+"), " ")
             .trim()
+
+        if (cleanText.isBlank()) return
 
         val result = tts?.speak(cleanText, queueMode, params, utteranceId)
         if (result == TextToSpeech.ERROR) {
-            Log.e(TAG, "Error speaking text: $cleanText")
+            Log.w(TAG, "Notice speaking text: $cleanText")
             onErrorSpeaking("Failed to speak text")
         }
     }

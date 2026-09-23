@@ -27,11 +27,11 @@ class ActionExecutor(
         return when (val res = appLauncher.launchApp(appName)) {
             is AppLaunchResult.Success -> ActionResult(
                 success = true,
-                message = "$appName khol rahi hoon."
+                message = "Haanji, $appName open kar diya aapke liye!"
             )
             is AppLaunchResult.NotFound -> ActionResult(
                 success = false,
-                message = "Ye app phone me installed nahi hai."
+                message = "Arey, ye app aapke phone me nahi mila."
             )
             is AppLaunchResult.Failed -> ActionResult(
                 success = false,
@@ -43,17 +43,17 @@ class ActionExecutor(
     fun executeTorch(enable: Boolean?): ActionResult {
         val ok = deviceController.toggleTorch(enable)
         return if (ok) {
-            val stateText = if (enable == true) "on" else if (enable == false) "off" else "toggle"
-            ActionResult(true, "Torch $stateText kar di.")
+            val stateText = if (enable == true) "on kar di" else if (enable == false) "off kar di" else "toggle kar di"
+            ActionResult(true, "Aapke liye torch $stateText hai!")
         } else {
-            ActionResult(false, "Torch access nahi ho payi.")
+            ActionResult(false, "Torch on nahi ho saki.")
         }
     }
 
     fun executeVolume(increase: Boolean): ActionResult {
         val ok = deviceController.adjustVolume(increase)
         return if (ok) {
-            ActionResult(true, if (increase) "Volume badha diya." else "Volume kam kar diya.")
+            ActionResult(true, if (increase) "Volume badha diya maine!" else "Volume dheere kar diya aapke liye!")
         } else {
             ActionResult(false, "Volume control nahi ho paya.")
         }
@@ -62,7 +62,7 @@ class ActionExecutor(
     fun executeSettings(panel: String?): ActionResult {
         val ok = deviceController.openSettings(panel)
         return if (ok) {
-            ActionResult(true, "Settings khol di.")
+            ActionResult(true, "Settings open kar di hai!")
         } else {
             ActionResult(false, "Settings open nahi ho saki.")
         }
@@ -70,15 +70,15 @@ class ActionExecutor(
 
     fun executeBattery(): ActionResult {
         val status = deviceController.getBatteryStatus()
-        return ActionResult(true, status)
+        return ActionResult(true, "Phone ki battery $status hai.")
     }
 
     fun executeCall(target: String): ActionResult {
         val ok = communicationController.makePhoneCall(target)
         return if (ok) {
-            ActionResult(true, "$target ko call laga rahi hoon.")
+            ActionResult(true, "Haanji, $target ko call laga rahi hoon!")
         } else {
-            ActionResult(false, "$target ko call nahi lag saki. Please check permissions.")
+            ActionResult(false, "$target ko call nahi lag saki. Permission check kijiye.")
         }
     }
 
@@ -86,16 +86,16 @@ class ActionExecutor(
         val ok = communicationController.openWhatsAppMessage(contact, message)
         return if (ok) {
             val dest = if (!contact.isNullOrBlank()) "$contact ke liye " else ""
-            ActionResult(true, "${dest}WhatsApp open kar diya.")
+            ActionResult(true, "${dest}WhatsApp open kar diya hai!")
         } else {
-            ActionResult(false, "WhatsApp me message screen open nahi ho saki.")
+            ActionResult(false, "WhatsApp open nahi ho saka.")
         }
     }
 
     fun executeYouTubeSearch(query: String): ActionResult {
         val ok = mediaController.searchYouTube(query)
         return if (ok) {
-            ActionResult(true, "YouTube par $query search kar rahi hoon.")
+            ActionResult(true, "Aapke liye YouTube par $query laga diya!")
         } else {
             ActionResult(false, "YouTube open nahi ho paya.")
         }
@@ -104,7 +104,7 @@ class ActionExecutor(
     fun executeSpotify(query: String?): ActionResult {
         val ok = mediaController.openSpotify(query)
         return if (ok) {
-            ActionResult(true, if (query.isNullOrBlank()) "Spotify open kar diya." else "Spotify par $query play kar rahi hoon.")
+            ActionResult(true, if (query.isNullOrBlank()) "Spotify open kar diya aapke liye!" else "Spotify par $query play kar rahi hoon!")
         } else {
             ActionResult(false, "Spotify open nahi ho paya.")
         }
@@ -113,7 +113,7 @@ class ActionExecutor(
     fun executeEmail(recipient: String?, subject: String?, body: String?): ActionResult {
         val ok = emailController.composeEmail(recipient, subject, body)
         return if (ok) {
-            ActionResult(true, "Email compose screen open kar di.")
+            ActionResult(true, "Email screen open kar di hai!")
         } else {
             ActionResult(false, "Email client open nahi ho paya.")
         }
@@ -126,7 +126,7 @@ class ActionExecutor(
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
-            ActionResult(true, "Google par $query search kar diya.")
+            ActionResult(true, "Maine Google par $query search kar diya!")
         } catch (e: Exception) {
             ActionResult(false, "Browser open nahi ho paya.")
         }
